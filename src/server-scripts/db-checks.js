@@ -37,7 +37,7 @@ var dbChecks = {
 			console.log("stats above")
 			if(err) deferred.reject("Failed to check stats in database!")
 
-			if (stats["statsSummary"].length > 5) {
+			if (stats !== null) {
 				deferred.resolve(stats, true)
 			}
 
