@@ -1,0 +1,48 @@
+{
+  "name": "my-project-production-environment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "clean-dist": "rm -r dist; mkdir dist",
+    "gulp": "gulp",
+    "preDevStart": "npm-run-all --parallel clean-dist gulp test:watch",
+    "DevStart": "node dist/server.js",
+    "test": "mocha --reporter spec \"src/**/*.test.js\"",
+    "test:watch": "xterm -hold -e nodemon --exec \"npm run test -s\""
+  },
+  "author": "Matthew Snow <mattsnowis@yahoo.com>",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "bootstrap": "^3.3.7",
+    "ejs": "^2.5.5",
+    "express": "^4.14.0",
+    "express-sanitizer": "^1.0.1",
+    "jquery": "^3.1.1",
+    "mongodb": "^2.2.20",
+    "mongoose": "^4.7.6",
+    "q": "^1.4.1",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "browserify": "^13.3.0",
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^2.3.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^3.0.1",
+    "gulp-live-server": "0.0.30",
+    "gulp-uglify": "^2.0.0",
+    "jsdom": "^9.9.1",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
+    "npm-run-all": "^4.0.0",
+    "open": "0.0.5",
+    "reactify": "^1.1.1",
+    "rimraf": "^2.5.4",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}

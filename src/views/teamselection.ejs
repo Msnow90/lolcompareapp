@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Production Environment Template</title>
+    <link rel="stylesheet" href="/css/allStyles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="jumbotron">
+        <h1>League of Legends Team Lookup App</h1>
+      </div>
+      <form action="/team-lookup" method="POST">
+        <input type="text" class="main-input form-control" name="summonerName" placeholder="Summoner Name...">
+        <button class="btn btn-lg main-submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+      </form>
+      <div id="apiResults">
+       <%= stats %>
+      </div>
+    </div>
+    <script type="text/javascript" src="/js/results-handler.js"></script>
+  </body>
+</html>

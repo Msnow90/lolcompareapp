@@ -1,0 +1,21 @@
+{
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": 7,
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "mocha": true,
+    "mongo": true
+  },
+  "rules": {
+    "no-console": 1,
+    "no-else-return": 1
+  },
+  "globals": {
+    jQuery: true,
+    $: true
+  }
+}

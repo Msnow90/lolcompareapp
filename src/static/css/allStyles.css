@@ -1,0 +1,14 @@
+body {
+  background:linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("/images/ahribg.jpg")center center fixed;
+  background-size:cover;
+}
+
+/*===================================*/
+/* ========== Form Styles ===========*/
+/*===================================*/
+
+.main-input.form-control {
+  height:50px;
+  width:75%;
+  display:inline;
+}
