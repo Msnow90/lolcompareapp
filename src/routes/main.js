@@ -61,30 +61,26 @@ router.post("/team-lookup", function(req, res) {
     if (!summaryComplete) {
       // return api-stat collection process using current collection summary object
       return apiCalls.getSummaryCollection(collectionSummary, apiKey)
-      //res.render("teamselection", {stats: "Hello!"})
+      .then(function(stats){
+
+        Stats.create(stats, function(err, savedData) {
+
+          if (err) {
+          console.log(err)
+          // change to provide feedback to user
+          res.redirect("back")
+        }
+
+        res.render("teamselection", {stats: stats})
+
+        })
+      })
     }
 
     else {
       //console.log(collectionSummary)
       res.render("teamselection", {stats: dbStatsCollection});
     }
-
-  })
-  .then(function(stats){
-
-    Stats.create(stats, function(err, savedData) {
-
-      if (err) {
-        console.log(err)
-        // change to provide feedback to user
-        res.redirect("back")
-      }
-
-      res.render("teamselection", {stats: stats})
-
-    })
-    
-
   })
   .catch(function(err) {
     console.log(err)
