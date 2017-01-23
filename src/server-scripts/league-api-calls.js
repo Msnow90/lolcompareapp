@@ -117,24 +117,110 @@ var champAssociations = {"0": "Overall","1":"Annie","2":"Olaf","3":"Galio","4":"
 
     var statsSummary = {};
 
+    var iteratorCounter = 0;
+
+    var maxIterations = collectionSummary["summonerIds"].length;
+
+
+//=========== Begin collection summary caller ============//
+
     collectionSummary["summonerIds"].forEach(function(sumId) {
 
-      var iterationCounter = 0;
+      reqStatAccumulator(sumId, function(err, champArr) {
 
-      reqStatAccumulator(sumId, function(error) {
+      // need to check if this is our last iteration, this will make sure we only return 
+      // after parsing every summoner id
+      if (iteratorCounter === maxIterations) {
+        // this check is necessary if it's the last iteration but no data to accumulate
+        // it will prevent errors by not parsing data that doesn't exist
+        if (err) {
+          collectionSummary["statsSummary"] = statsSummary
+          return deferred.resolve(collectionSummary)
+        }
 
-        if (error && statsSummary["Overall"] == undefined) deferred.reject("Failed to process any data!")
+        // code here will ensure our data accumulates before resolving our promise
 
-        
+
+      }
+
+      // this last error check will just skip this iteration in the foreach loop
+      // if there was an error requesting stats for the summoner
+      if (err) return false;
+
+
+      // if no errors exist and iteration counter is not finished:
+      champArr.forEach(function(champ) {
+
+        // ensure we don't accumulate an object's properties that don't exist
+        if (statsSummary[champ["name"]] === undefined) {
+
+          statsSummary[champ["name"]] = {}
+
+          statsSummary[champ["name"]]["kills"] = champ["kills"]
+          statsSummary[champ["name"]]["assists"] = champ["assists"]
+          statsSummary[champ["name"]]["deaths"] = champ["deaths"]
+          statsSummary[champ["name"]]["gamesPlayed"] = champ["gamesPlayed"]
+          statsSummary[champ["name"]]["wins"] = champ["wins"]
+          statsSummary[champ["name"]]["losses"] = champ["losses"]
+
+          return 1
+
+        }
+
+        // accumulate stats if the champion exists, so no data is overwritten
+        statsSummary[champ["name"]]["kills"] += champ["kills"]
+        statsSummary[champ["name"]]["assists"] += champ["assists"]
+        statsSummary[champ["name"]]["deaths"] += champ["deaths"]
+        statsSummary[champ["name"]]["gamesPlayed"] += champ["gamesPlayed"]
+        statsSummary[champ["name"]]["wins"] += champ["wins"]
+        statsSummary[champ["name"]]["losses"] += champ["losses"]
+
 
       })
+
+
+     })
+
     })
 
 
-    // reqStatAccumulator function will be mapped to each summoner id in the collection
+//=========== End Collection Summary Caller ================//
+
+
+    function reqStatAccumulator(sumid, callback) {
+      request("https://na.api.pvp.net/api/lol/na/v1.3/stats/by-summoner/" + sumId + "/ranked?season=SEASON2017&" + apiKey, function(error, response, body) {
+
+        if (err || response.statusCode !== 200) return callback(err);
+
+        var data = JSON.parse(body)
+
+        var champDataArr = data["champions"].map(function(champInfo) {
+          var champObj = {};
+
+          champObj["name"] = champAssociations[champInfo["id"]];
+          champObj["kills"] = Number(champInfo["stats"]["totalChampionKills"])
+          champObj["deaths"] = Number(champInfo["stats"]["totalDeathsPerSession"])
+          champObj["assists"] = Number(champInfo["stats"]["totalAssists"])
+          champObj["gamesPlayed"] = Number(champInfo["stats"]["totalSessionsPlayed"])
+          champObj["wins"] = Number(champInfo["stats"]["totalSessionsWon"])
+          champObj["losses"] = Number(champInfo["stats"]["totalSessionsLost"])
+
+          iteratorCounter++
+
+          return callback(null, champObj)
+
+        })
+
+        return callback(null, champDataArr)
+
+      })
+    }
+
+
+    /*// reqStatAccumulator function will be mapped to each summoner id in the collection
     // passed to this object's getSummaryCollection method, this will accumulate the 
     // stats of all champions in the statsSummary object
-    function reqStatAccumulator(sumId, callback) {
+    function reqStatAccumulator(sumId) {
 
       request("https://na.api.pvp.net/api/lol/na/v1.3/stats/by-summoner/" + sumId + "/ranked?season=SEASON2017&" + apiKey, function(error, response, body) {
 
@@ -179,12 +265,12 @@ var champAssociations = {"0": "Overall","1":"Annie","2":"Olaf","3":"Galio","4":"
           else {
 
             // increment the stats here
-            statsSummary[indexRef["id"]]["kills"] += indexRef["stats"]["totalChampionKills"]
-            statsSummary[indexRef["id"]]["deaths"] += indexRef["stats"]["totalDeathsPerSession"]
-            statsSummary[indexRef["id"]]["assists"] += indexRef["stats"]["totalAssists"]
-            statsSummary[indexRef["id"]]["gamesPlayed"] += indexRef["stats"]["totalSessionsPlayed"]
-            statsSummary[indexRef["id"]]["wins"] += indexRef["stats"]["totalSessionsWon"]
-            statsSummary[indexRef["id"]]["losses"] += indexRef["stats"]["totalSessionsLost"]
+            statsSummary[champName]["kills"] += indexRef["stats"]["totalChampionKills"]
+            statsSummary[champName]["deaths"] += indexRef["stats"]["totalDeathsPerSession"]
+            statsSummary[champName]["assists"] += indexRef["stats"]["totalAssists"]
+            statsSummary[champName]["gamesPlayed"] += indexRef["stats"]["totalSessionsPlayed"]
+            statsSummary[champName]["wins"] += indexRef["stats"]["totalSessionsWon"]
+            statsSummary[champName]["losses"] += indexRef["stats"]["totalSessionsLost"]
 
             if(i === data["champions"].length) {
 
@@ -199,7 +285,7 @@ var champAssociations = {"0": "Overall","1":"Annie","2":"Olaf","3":"Galio","4":"
 
       })
 
-    }
+    }*/
 
     return deferred.promise
   }
