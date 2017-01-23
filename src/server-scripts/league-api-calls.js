@@ -113,9 +113,64 @@ var champAssociations = {"0": "Overall","1":"Annie","2":"Olaf","3":"Galio","4":"
 "143":"Zyra","150":"Gnar","154":"Zac","157":"Yasuo","161":"Velkoz","163":"Taliyah","201":"Braum","202":"Jhin","203":"Kindred","222":"Jinx","223":"TahmKench","236":"Lucian",
 "238":"Zed","245":"Ekko","254":"Vi","266":"Aatrox","267":"Nami","268":"Azir","412":"Thresh","420":"Illaoi","421":"RekSai","429":"Kalista","432":"Bard"};
 
+var reqCounter = 0
+var sumIds = collectionSummary["summonerIds"]
+var statsSummary = {}
+
+var reqInterval = setInterval(function() {
+
+  request("https://na.api.pvp.net/api/lol/na/v1.3/stats/by-summoner/" + sumIds[reqCounter] + "/ranked?season=SEASON2017&" + apiKey, function(error, response, body) {
+
+    if (error || response.statusCode !== 200) {
+      collectionSummary["statsSummary"] = statsSummary
+      return deferred.resolve(collectionSummary)
+    }
 
 
-    var statsSummary = {};
+    var data = JSON.parse(body)
+
+
+    for(var i = 0; i < data["champions"].length; ++i) {
+
+      var indexRef = data["champions"][i]
+
+      var champName = champAssociations[data["champions"][i]["id"]];
+
+      if (statsSummary[champName] == undefined) {
+
+        statsSummary[champName] = {}
+
+        // set stats equal to the property I wish to take from data
+        statsSummary[champName]["kills"] = indexRef["stats"]["totalChampionKills"]
+        statsSummary[champName]["deaths"] = indexRef["stats"]["totalDeathsPerSession"]
+        statsSummary[champName]["assists"] = indexRef["stats"]["totalAssists"]
+        statsSummary[champName]["gamesPlayed"] = indexRef["stats"]["totalSessionsPlayed"]
+        statsSummary[champName]["wins"] = indexRef["stats"]["totalSessionsWon"]
+        statsSummary[champName]["losses"] = indexRef["stats"]["totalSessionsLost"]
+
+      }
+
+      // increment the stats here
+      statsSummary[champName]["kills"] += indexRef["stats"]["totalChampionKills"]
+      statsSummary[champName]["deaths"] += indexRef["stats"]["totalDeathsPerSession"]
+      statsSummary[champName]["assists"] += indexRef["stats"]["totalAssists"]
+      statsSummary[champName]["gamesPlayed"] += indexRef["stats"]["totalSessionsPlayed"]
+      statsSummary[champName]["wins"] += indexRef["stats"]["totalSessionsWon"]
+      statsSummary[champName]["losses"] += indexRef["stats"]["totalSessionsLost"]
+
+      if (reqCounter === sumIds.length -1) {
+        collectionSummary["statsSummary"] = statsSummary
+        deferred.resolve(collectionSummary)
+      }
+
+      }
+
+    return 1
+
+  })
+},1000)
+
+   /* var statsSummary = {};
 
     var iteratorCounter = 0;
 
@@ -216,13 +271,13 @@ var champAssociations = {"0": "Overall","1":"Annie","2":"Olaf","3":"Galio","4":"
         return callback(null, champDataArr)
 
       })
-    }
+    }*/
 
 
-    /*// reqStatAccumulator function will be mapped to each summoner id in the collection
+    // reqStatAccumulator function will be mapped to each summoner id in the collection
     // passed to this object's getSummaryCollection method, this will accumulate the 
     // stats of all champions in the statsSummary object
-    function reqStatAccumulator(sumId) {
+   /* function reqStatAccumulator(sumId) {
 
       request("https://na.api.pvp.net/api/lol/na/v1.3/stats/by-summoner/" + sumId + "/ranked?season=SEASON2017&" + apiKey, function(error, response, body) {
 
