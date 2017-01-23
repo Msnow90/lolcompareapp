@@ -126,8 +126,10 @@ var champAssociations = {"0": "Overall","1":"Annie","2":"Olaf","3":"Galio","4":"
 
     collectionSummary["summonerIds"].forEach(function(sumId) {
 
-      reqStatAccumulator(sumId, function(err, champArr) {
 
+      reqStatAccumulator(sumId, function(err, champArr) {
+      console.log("champ arr is: ")
+      console.log(champArr)
       // need to check if this is our last iteration, this will make sure we only return 
       // after parsing every summoner id
       if (iteratorCounter === maxIterations) {
@@ -187,10 +189,10 @@ var champAssociations = {"0": "Overall","1":"Annie","2":"Olaf","3":"Galio","4":"
 //=========== End Collection Summary Caller ================//
 
 
-    function reqStatAccumulator(sumid, callback) {
+    function reqStatAccumulator(sumId, callback) {
       request("https://na.api.pvp.net/api/lol/na/v1.3/stats/by-summoner/" + sumId + "/ranked?season=SEASON2017&" + apiKey, function(error, response, body) {
 
-        if (err || response.statusCode !== 200) return callback(err);
+        if (error || response.statusCode !== 200) return callback(error);
 
         var data = JSON.parse(body)
 

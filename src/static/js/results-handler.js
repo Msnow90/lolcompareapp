@@ -1,4 +1,4 @@
-var accessibleStats = <%= stats %>;
+var accessibleStats = "";
 
 window.onload = function(){
 

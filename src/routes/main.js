@@ -51,43 +51,46 @@ router.post("/team-lookup", function(req, res) {
 
     return dbChecks.checkStats(collectionSummary)
   })
-  .then(function(collectionSummary, summaryComplete) {
+  .then(function(collectionSummary) {
 
     console.log("chain...5")
-    console.log(collectionSummary)
-    console.log("col sum above")
+    //console.log(collectionSummary)
+    //console.log("col sum above")
     // if dbStatsCollection is null, the collectionSummary object will require 
     // processing of data from it's summonerIds array
-    if (!summaryComplete) {
+    if (collectionSummary["complete"] === false) {
+      console.log("why?!?!")
       // return api-stat collection process using current collection summary object
       return apiCalls.getSummaryCollection(collectionSummary, apiKey)
-      .then(function(stats){
-
-        Stats.create(stats, function(err, savedData) {
-
-          if (err) {
-          console.log(err)
-          // change to provide feedback to user
-          res.redirect("back")
-        }
-
-        res.render("teamselection", {stats: stats})
-
-        })
-      })
     }
 
     else {
       //console.log(collectionSummary)
-      res.render("teamselection", {stats: dbStatsCollection});
+      res.render("teamselection", {stats: collectionSummary});
+      throw new Error("Success")
     }
+  })
+  .then(function(stats){
+    console.log("hello??!?!?!")
+
+    Stats.create(stats, function(err, savedData) {
+
+      if (err) {
+        console.log(err)
+        // change to provide feedback to user 
+        res.redirect("back")
+      }
+
+      res.render("teamselection", {stats: stats})
+
+    })
   })
   .catch(function(err) {
     console.log(err)
+    if (err === "Success") return 1
     // send error object to ejs templates
-    res.render("index", {error: "Error processing request!"})
+    else res.render("index", {error: "Error processing request!"})
   })
-
 
 
 
